@@ -96,7 +96,9 @@ static struct panel_list supp_panels[] = {
 	{"r63417_1080p_video", R63417_1080P_VIDEO_PANEL},
 	{"jdi_a216_fhd_video", JDI_A216_FHD_VIDEO_PANEL},
 	{"adv7533_1080p_video", ADV7533_1080P_VIDEO_PANEL},
+	{"adv7533_1080p", ADV7533_1080P_VIDEO_PANEL},
 	{"adv7533_720p_video", ADV7533_720P_VIDEO_PANEL},
+	{"adv7533_720p", ADV7533_720P_VIDEO_PANEL},
 };
 
 static uint32_t panel_id;
