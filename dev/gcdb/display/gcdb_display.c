@@ -48,9 +48,9 @@
 /*---------------------------------------------------------------------------*/
 /* static                                                                    */
 /*---------------------------------------------------------------------------*/
-static struct msm_fb_panel_data panel;
+struct msm_fb_panel_data panel;
 struct panel_struct panelstruct;
-static uint8_t display_enable;
+uint8_t display_enable;
 static struct mdss_dsi_phy_ctrl dsi_video_mode_phy_db;
 
 /*---------------------------------------------------------------------------*/
