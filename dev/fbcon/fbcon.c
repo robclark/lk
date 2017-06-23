@@ -384,9 +384,10 @@ void fbcon_setup(struct fbcon_config *_config)
 	case FB_FORMAT_RGB565:
 		fb_color_formats = fb_color_formats_555;
 		break;
-        case FB_FORMAT_RGB888:
+	case FB_FORMAT_RGB888:
+	case FB_FORMAT_RGB8888:
 		fb_color_formats = fb_color_formats_888;
-                break;
+		break;
 	default:
 		dprintf(CRITICAL, "unknown framebuffer pixel format\n");
 		ASSERT(0);
