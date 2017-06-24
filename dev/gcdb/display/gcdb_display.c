@@ -404,8 +404,13 @@ int gcdb_display_init(const char *panel_name, uint32_t rev, void *base)
 		panel.fb.width =  panel.panel_info.xres;
 		panel.fb.height =  panel.panel_info.yres;
 		panel.fb.stride =  panel.panel_info.xres;
-		panel.fb.bpp =  panel.panel_info.bpp;
-		panel.fb.format = panel.panel_info.mipi.dst_format;
+#if 0
+		panel.fb.bpp =  16;
+		panel.fb.format = FB_FORMAT_RGB565;
+#else
+		panel.fb.bpp =  32;
+		panel.fb.format = FB_FORMAT_RGB8888;
+#endif
 	} else if (pan_type == PANEL_TYPE_EDP) {
 		mdss_edp_panel_init(&(panel.panel_info));
 		/* prepare func is set up at edp_panel_init */
