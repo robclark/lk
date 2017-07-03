@@ -432,7 +432,7 @@ void fbcon_extract_to_screen(logo_img_header *header, void* address)
 	/* put the logo to be center */
 	offset = (config->height - header->height) / 2;
 	if (offset)
-		base += (offset * config->width) * 3;
+		base += (offset * config->width) * config->bpp / 8;
 	offset = (config->width - header->width ) / 2;
 
 	x = offset;
@@ -445,13 +445,21 @@ void fbcon_extract_to_screen(logo_img_header *header, void* address)
 		/* consume the run byte */
 		pos++;
 
-		p = base + (y * config->width + x) * 3;
+		p = base + (y * config->width + x) * config->bpp / 8;
 
 		/* start of a run */
 		for (runpos = 0; runpos < runlen; runpos++) {
-			*p++ = *(imagestart + pos);
-			*p++ = *(imagestart + pos + 1);
-			*p++ = *(imagestart + pos + 2);
+			// NOTE: BGRA vs RGB:
+			if (config->bpp == 32) {
+				*p++ = *(imagestart + pos + 2);
+				*p++ = *(imagestart + pos + 1);
+				*p++ = *(imagestart + pos);
+				*p++ = 0xff;
+			} else {
+				*p++ = *(imagestart + pos);
+				*p++ = *(imagestart + pos + 1);
+				*p++ = *(imagestart + pos + 2);
+			}
 			count++;
 
 			x++;
