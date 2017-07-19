@@ -1116,10 +1116,58 @@ int dev_tree_add_first_mem_info(uint32_t *fdt, uint32_t offset, uint32_t addr, u
 	return ret;
 }
 
+static int parsed_addr_size(void *fdt, uint32_t offset, uint32_t *addrsz, uint32 **sizesz)
+{
+	int len;
+	uint32_t *valp;
+
+	/* Find the #address-cells size. */
+	valp = (uint32_t*)fdt_getprop(fdt, offset, "#address-cells", &len);
+	if (len <= 0 || !valp)
+	{
+		if (len == -FDT_ERR_NOTFOUND)
+		{
+			/* Property not found.
+			* Assume standard sizes.
+			*/
+			*addrsz = 2;
+			dprintf(CRITICAL, "Using default #addr_cell_size: %u\n", *addrsz);
+		}
+		else
+		{
+			dprintf(CRITICAL, "Error finding the #address-cells property\n");
+			return len;
+		}
+	}
+	else
+		*addrsz = fdt32_to_cpu(*valp);
+
+	/* Find the #size-cells size. */
+	valp = (uint32_t*)fdt_getprop(fdt, offset, "#size-cells", &len);
+	if (len <= 0 || !valp)
+	{
+		if (len == -FDT_ERR_NOTFOUND)
+		{
+			/* Property not found.
+			* Assume standard sizes.
+			*/
+			*sizesz = 2;
+			dprintf(CRITICAL, "Using default #size_cell_size: %u\n", *sizesz);
+		}
+		else
+		{
+			dprintf(CRITICAL, "Error finding the #size-cells property\n");
+			return len;
+		}
+	}
+	else
+		*sizesz = fdt32_to_cpu(*valp);
+
+	return 0;
+}
+
 static int dev_tree_query_memory_cell_sizes(void *fdt, struct dt_mem_node_info *mem_node, uint32_t mem_node_offset)
 {
-	int      len;
-	uint32_t *valp;
 	int      ret;
 	uint32_t offset;
 
@@ -1135,49 +1183,7 @@ static int dev_tree_query_memory_cell_sizes(void *fdt, struct dt_mem_node_info *
 
 	offset = ret;
 
-	/* Find the #address-cells size. */
-	valp = (uint32_t*)fdt_getprop(fdt, offset, "#address-cells", &len);
-	if (len <= 0 || !valp)
-	{
-		if (len == -FDT_ERR_NOTFOUND)
-		{
-			/* Property not found.
-			* Assume standard sizes.
-			*/
-			mem_node->addr_cell_size = 2;
-			dprintf(CRITICAL, "Using default #addr_cell_size: %u\n", mem_node->addr_cell_size);
-		}
-		else
-		{
-			dprintf(CRITICAL, "Error finding the #address-cells property\n");
-			return len;
-		}
-	}
-	else
-		mem_node->addr_cell_size = fdt32_to_cpu(*valp);
-
-	/* Find the #size-cells size. */
-	valp = (uint32_t*)fdt_getprop(fdt, offset, "#size-cells", &len);
-	if (len <= 0 || !valp)
-	{
-		if (len == -FDT_ERR_NOTFOUND)
-		{
-			/* Property not found.
-			* Assume standard sizes.
-			*/
-			mem_node->size_cell_size = 1;
-			dprintf(CRITICAL, "Using default #size_cell_size: %u\n", mem_node->size_cell_size);
-		}
-		else
-		{
-			dprintf(CRITICAL, "Error finding the #size-cells property\n");
-			return len;
-		}
-	}
-	else
-		mem_node->size_cell_size = fdt32_to_cpu(*valp);
-
-	return 0;
+	return parsed_addr_size(fdt, offset, &mem_node->addr_cell_size, &mem_node->size_cell_size);
 }
 
 static void dev_tree_update_memory_node(uint32_t offset)
