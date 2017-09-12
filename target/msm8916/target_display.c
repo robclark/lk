@@ -323,10 +323,22 @@ w_regs_fail:
 
 int target_display_dsi2hdmi_config(struct msm_panel_info *pinfo)
 {
+	uint8_t val;
 	int ret = NO_ERROR;
 
 	if (!pinfo)
 		return ERR_INVALID_ARGS;
+
+#define ADV7511_REG_STATUS			0x42
+#define ADV7511_STATUS_POWER_DOWN_POLARITY	BIT(7)
+#define ADV7511_STATUS_HPD			BIT(6)
+#define ADV7511_STATUS_MONITOR_SENSE		BIT(5)
+#define ADV7511_STATUS_I2S_32BIT_MODE		BIT(3)
+	ret = mipi_dsi_i2c_read_byte(ADV7533_MAIN, ADV7511_REG_STATUS, &val);
+	if (ret)
+		return ret;
+	if (!(val & ADV7511_STATUS_HPD))
+		return ERROR;
 
 	/*
 	 * If dsi to HDMI bridge chip connected then
